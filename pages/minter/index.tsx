@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
-import contractAbi from '../contractAbi.json'
+import contractAbi from '../../contractAbi.json'
 
 export default function Minter() {
   const [walletAddress, setWalletAddress] = useState<string>('')
+  const [contractIsEnabled, setContractEnabled] = useState<boolean>(true)
 
-  const contractAddress = '0x6E1412c13B191F7Ce707631EdbfB330b11862815'
+  const contractAddress = '0x27D3b6A879330F5f6f394492dE9417F59989F467'
 
   async function verifyIfWalletIsConnected() {
     const { ethereum } = window
@@ -45,12 +46,39 @@ export default function Minter() {
       )
       console.log('contractInstace', contractInstace)
 
-      const contractWithSigner = contractInstace.connect(signer)
+      const contractWithSigner = await contractInstace.connect(signer)
       console.log('contractWithSigner', contractWithSigner)
 
-      const mintNft = await contractWithSigner.mintNFT(1)
+      const isEnabled = await contractWithSigner.isEnabled()
+      console.log('isEnabled =>', isEnabled)
 
-      console.log('mintNft', mintNft)
+      if (isEnabled) {
+        console.log('ESTÁ ATIVO')
+        const isWhitelistOn = await contractWithSigner.isWhitelistOn()
+        console.log('isWhitelistOn =>', isWhitelistOn)
+
+        if (isWhitelistOn) {
+          const addressIsOnWhitelist = await contractWithSigner.addressToBoolWl(
+            walletAddress,
+          )
+          console.log('addressIsOnWhitelist', addressIsOnWhitelist)
+
+          if (addressIsOnWhitelist) {
+            const mintNft = await contractWithSigner.mintNFT(1, {
+              value: ethers.utils.parseUnits('0.01', 'ether'),
+            })
+
+            console.log('mintNftWithWhitelist', mintNft)
+          }
+        } else {
+          const mintNft = await contractWithSigner.mintNFT(1, {
+            value: ethers.utils.parseUnits('0.01', 'ether'),
+          })
+          console.log('mintNft', mintNft)
+        }
+      } else {
+        setContractEnabled(false)
+      }
     } else {
       alert("You don't have the metamask extension installed!")
     }
@@ -87,6 +115,7 @@ export default function Minter() {
 
           {walletAddress ? (
             <button
+              disabled={!contractIsEnabled}
               onClick={handleMintNFT}
               className="mt-auto py-4 rounded-lg text-lg w-full bg-gradient-to-r text-white font-bold from-orange-500 to-yellow-500"
             >
