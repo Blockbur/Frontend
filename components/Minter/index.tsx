@@ -58,16 +58,20 @@ export function Minter() {
       )
 
       const contractWithSigner = await contractInstace.connect(signer)
+      console.log('contractWithSigner', contractWithSigner)
 
       const isEnabled = await contractWithSigner.isEnabled()
+      console.log('isEnabled', isEnabled)
 
       if (isEnabled) {
         const isWhitelistOn = await contractWithSigner.isWhitelistOn()
+        console.log('isWhitelistOn', isWhitelistOn)
 
         if (isWhitelistOn) {
           const addressIsOnWhitelist = await contractWithSigner.addressToBoolWl(
             walletAddress,
           )
+          console.log('addressIsOnWhitelist', addressIsOnWhitelist)
 
           if (addressIsOnWhitelist) {
             const mintNft = await contractWithSigner.mintNFT(amountToMint, {
@@ -101,10 +105,9 @@ export function Minter() {
 
     if (ethereum) {
       const accounts = await ethereum.request({ method: 'eth_accounts' })
+      console.log('accounts', accounts)
 
-      const addressExists = accounts[0].length > 0
-
-      if (addressExists) {
+      if (accounts.length) {
         const address = accounts[0]
 
         setWalletAddress(address)
@@ -136,7 +139,9 @@ export function Minter() {
 
   useEffect(() => {
     ;(async () => {
-      await getNFTInitialData(walletAddress)
+      if (walletAddress) {
+        await getNFTInitialData(walletAddress)
+      }
     })()
   }, [walletAddress])
 
