@@ -11,8 +11,6 @@ import { ConnecWalletButton } from './components/ConnectWalletButton'
 export function Header() {
   const [walletAddress, setWalletAddress] = useState<string>('')
 
-  console.log('walletAddress ==>', walletAddress)
-
   const navigationItems = [
     { name: 'HOME', href: '/' },
     { name: 'MINT', href: '/mint' },
@@ -31,6 +29,7 @@ export function Header() {
       const address = await signer.getAddress()
 
       setWalletAddress(address)
+      console.log('walletAddress ==>', address)
     } else {
       alert("You don't have the metamask extension installed!")
     }

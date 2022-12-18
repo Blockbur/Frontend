@@ -27,7 +27,11 @@ export function Minter() {
 
   const nftPrice = 0.01
 
-  const disableMint = !contractIsEnabled
+  const maxSupplyReached = totalAmountOfNFTsMinted === totalSupply
+  const maxSupplyPerUserReached = userNftsMinted === maxSupplyPerWallet
+
+  const disableMint =
+    !contractIsEnabled || maxSupplyReached || maxSupplyPerUserReached
 
   function handleIncreaseBuyAmount() {
     setAmountOfNftsToBuy((prevAmount) => prevAmount + 1)
@@ -52,24 +56,18 @@ export function Minter() {
         contractAbi,
         provider,
       )
-      console.log('contractInstace', contractInstace)
 
       const contractWithSigner = await contractInstace.connect(signer)
-      console.log('contractWithSigner', contractWithSigner)
 
       const isEnabled = await contractWithSigner.isEnabled()
-      console.log('isEnabled =>', isEnabled)
 
       if (isEnabled) {
-        console.log('ESTÁ ATIVO')
         const isWhitelistOn = await contractWithSigner.isWhitelistOn()
-        console.log('isWhitelistOn =>', isWhitelistOn)
 
         if (isWhitelistOn) {
           const addressIsOnWhitelist = await contractWithSigner.addressToBoolWl(
             walletAddress,
           )
-          console.log('addressIsOnWhitelist', addressIsOnWhitelist)
 
           if (addressIsOnWhitelist) {
             const mintNft = await contractWithSigner.mintNFT(amountToMint, {
@@ -116,7 +114,7 @@ export function Minter() {
     }
   }
 
-  async function getNFTInitialData() {
+  async function getNFTInitialData(walletAddress: string) {
     const totalSupply = await getTotalSupply()
     setTotalSupply(totalSupply as number)
 
@@ -133,9 +131,14 @@ export function Minter() {
   useEffect(() => {
     ;(async () => {
       await verifyIfWalletIsConnected()
-      await getNFTInitialData()
     })()
   }, [])
+
+  useEffect(() => {
+    ;(async () => {
+      await getNFTInitialData(walletAddress)
+    })()
+  }, [walletAddress])
 
   return (
     <div className="max-w-[800px] w-full bg-gray800 rounded-[24px] py-12 px-9 flex items-stretch justify-between mx-auto shadow-xl">
@@ -174,9 +177,11 @@ export function Minter() {
           <button
             disabled={disableMint}
             onClick={() => handleMintNFT(amountOfNftsToBuy)}
-            className="w-full py-4 bg-purple-gradient rounded-xl text-lg text-white font-bold"
+            className="w-full py-4 bg-purple-gradient rounded-xl text-lg text-white font-bold shadow-lg"
           >
-            MINT (Minted: {userNftsMinted} / {maxSupplyPerWallet})
+            {walletAddress
+              ? `MINT (Minted: ${userNftsMinted} / ${maxSupplyPerWallet})`
+              : 'CONNECT WALLET'}
           </button>
         </div>
       </div>
