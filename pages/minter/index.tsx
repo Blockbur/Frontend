@@ -12,6 +12,8 @@ import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import contractAbi from '../../contractAbi.json'
 
+import { CaretRight, CaretLeft } from 'phosphor-react'
+
 export default function Minter() {
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [contractIsEnabled, setContractEnabled] = useState<boolean>(true)
@@ -118,31 +120,45 @@ export default function Minter() {
         <div className="max-w-[1280px] w-full px-4 lg:px-8 flex justify-between items-center mx-auto">
           <Image src={logoImg} alt="Logo da weirds" />
           <ul className="flex items-center gap-11 text-lg">
-            <li className="text-red-500 text-3xl font-bold underline">HOME</li>
-            <li>MINT</li>
+            <li>HOME</li>
+            <li className="bg-clip-text bg-purple-gradient text-transparent">
+              MINT
+            </li>
             <li>JOIN US</li>
           </ul>
-          <button>Connect wallet</button>
+          <button className="py-4 px-9 text-xl font-bold bg-purple-gradient rounded-xl">
+            Connect wallet
+          </button>
         </div>
       </header>
       <main className="w-screen">
-        <div className="max-w-[1280px] w-full mx-auto px-4 lg:px-8">
-          <div className="bg-gray800 rounded-[24px] py-12 px-9">
-            <div>
-              <div>
-                <h1>NFT NAME</h1>
-                <p>
+        <div className="max-w-[1280px] w-full mx-auto px-4 lg:px-8 mt-24">
+          <div className="bg-gray800 rounded-[24px] py-12 px-9 flex justify-between">
+            <div className="max-w-[328px] w-full flex flex-col gap-14">
+              <div className="flex flex-col gap-2">
+                <h1 className="text-[42px] font-bold">NFT NAME</h1>
+                <p className="text-gray100 font-medium">
                   simply dummy text of the printing and typesetting industry.
                   Lorem Ipsum has been the industrys standard dummy
                 </p>
               </div>
-              <div>
-                <h2>AMOUNT: </h2>
-                <span>1</span>
+              <div className="flex flex-col gap-4">
+                <h2 className="text-2xl font-bold">AMOUNT: </h2>
+                <div className="flex item-center gap-4">
+                  <CaretLeft className="text-white" size={48} weight="fill" />
+
+                  <span className="font-bold text-[32px]">1</span>
+
+                  <CaretRight className="text-white" size={48} weight="fill" />
+                </div>
               </div>
-              <div>
-                <span>Total supply: 12/45</span>
-                <button>MINT (Minted: 1/5)</button>
+              <div className="flex flex-col gap-4 font-medium">
+                <span className="text-gray100 text-lg">
+                  Total supply: 12/45
+                </span>
+                <button className="w-full bg-purple-gradient rounded-xl text-lg text-white font-extrabold">
+                  MINT (Minted: 1/5)
+                </button>
               </div>
             </div>
             <div>
