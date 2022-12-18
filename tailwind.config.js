@@ -28,7 +28,7 @@ module.exports = {
       },
 
       backgroundImage: {
-        'purple-gradient': 'linear-gradient(90deg, #7B6DC7 0%, #9C91F0 100%)',
+        'purple-gradient': 'linear-gradient(90deg, #4236A2 0%, #7B6DC7 100%)',
       },
     },
   },
