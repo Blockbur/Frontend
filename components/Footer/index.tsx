@@ -15,7 +15,7 @@ export function Footer() {
 
   return (
     <footer className="w-screen bg-gray700">
-      <div className="max-w-[1280px] w-full flex items-stretch justify-between py-10 px-4 lg:px-8 mt-48 mx-auto">
+      <div className="max-w-[1440px] w-full flex items-stretch justify-between py-10 px-4 lg:px-8 mt-48 mx-auto">
         <Image src={logoImgLg} alt="Logo da Weirds" />
         <div className="max-w-[256px] w-full flex flex-col text-sm">
           <strong className="font-bold">FALE CONOSCO</strong>

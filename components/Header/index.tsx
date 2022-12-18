@@ -38,7 +38,7 @@ export function Header() {
 
   return (
     <header className="w-screen py-4">
-      <div className="max-w-[1280px] w-full px-4 lg:px-8 flex justify-between items-center mx-auto">
+      <div className="max-w-[1440px] w-full px-4 lg:px-8 flex justify-between items-center mx-auto">
         <Link href="/">
           <Image src={logoImg} alt="Logo da weirds" />
         </Link>
