@@ -1,8 +1,15 @@
-import { ethers } from 'ethers'
-import { useEffect, useState } from 'react'
+import logoImg from '../../assets/weirds-white-logo.png'
+import logoImgLg from '../../assets/weirds-white-logo-lg.png'
+import testNftImg from '../../assets/test-nft.png'
+
+import twitterLogo from '../../assets/social-medias/twitter.svg'
+import linkedinLogo from '../../assets/social-medias/linkedin.svg'
+import discordLogo from '../../assets/social-medias/discord.svg'
 
 import Image from 'next/image'
 
+import { ethers } from 'ethers'
+import { useEffect, useState } from 'react'
 import contractAbi from '../../contractAbi.json'
 
 export default function Minter() {
@@ -106,31 +113,75 @@ export default function Minter() {
   }, [])
 
   return (
-    <div className="w-screen h-screen bg-gray-900">
-      <div className="max-w-[360px] lg:max-w-[1440px] w-full pt-32 mx-auto">
-        <div className="w-[600px] h-[400px] bg-gray-500 shadow-xl rounded-2xl p-8 flex flex-col mx-auto">
-          <h1 className="text-center text-4xl font-bold">Mint NFT</h1>
-
-          <Image src="" alt="" />
-
-          {walletAddress ? (
-            <button
-              disabled={!contractIsEnabled}
-              onClick={handleMintNFT}
-              className="mt-auto py-4 rounded-lg text-lg w-full bg-gradient-to-r text-white font-bold from-orange-500 to-yellow-500"
-            >
-              MINT
-            </button>
-          ) : (
-            <button
-              onClick={handleConnectWallet}
-              className="mt-auto py-4 rounded-lg text-lg w-full bg-gradient-to-r text-white font-bold from-orange-500 to-yellow-500"
-            >
-              CONNECT WALLET
-            </button>
-          )}
+    <div className="w-screen min-h-screen">
+      <header className="w-screen py-4">
+        <div className="max-w-[1280px] w-full px-4 lg:px-8 flex justify-between items-center mx-auto">
+          <Image src={logoImg} alt="Logo da weirds" />
+          <ul className="flex items-center gap-11 text-lg">
+            <li className="text-red-500 text-3xl font-bold underline">HOME</li>
+            <li>MINT</li>
+            <li>JOIN US</li>
+          </ul>
+          <button>Connect wallet</button>
         </div>
-      </div>
+      </header>
+      <main className="w-screen">
+        <div className="max-w-[1280px] w-full mx-auto px-4 lg:px-8">
+          <div className="bg-gray800 rounded-[24px] py-12 px-9">
+            <div>
+              <div>
+                <h1>NFT NAME</h1>
+                <p>
+                  simply dummy text of the printing and typesetting industry.
+                  Lorem Ipsum has been the industrys standard dummy
+                </p>
+              </div>
+              <div>
+                <h2>AMOUNT: </h2>
+                <span>1</span>
+              </div>
+              <div>
+                <span>Total supply: 12/45</span>
+                <button>MINT (Minted: 1/5)</button>
+              </div>
+            </div>
+            <div>
+              <h1>0.01 MATIC</h1>
+              <Image src={testNftImg} alt="NFT image" />
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer className="w-screen">
+        <div className="max-w-[1280px] w-full bg-gray700 py-10 px-4 lg:px-8">
+          <Image src={logoImgLg} alt="Logo da Weirds" />
+          <div>
+            <strong>FALE CONOSCO</strong>
+            <input type="text" placeholder="E-mail" />
+            <button>ENVIAR</button>
+          </div>
+          <div>
+            <ul>
+              <li>
+                <a href="">
+                  <Image src={linkedinLogo} alt="Logo do Linkedin" />
+                </a>
+              </li>
+              <li>
+                <a href="">
+                  <Image src={twitterLogo} alt="Logo do Twitter" />
+                </a>
+              </li>
+              <li>
+                <a href="">
+                  <Image src={discordLogo} alt="Logo do Discord" />
+                </a>
+              </li>
+            </ul>
+            <span>@WEIRDBAND | All Rigths Reserverd </span>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
