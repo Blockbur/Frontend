@@ -6,16 +6,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import logoImg from '../../assets/weirds-white-logo.png'
 
-import { ConnecWalletButton } from './components/ConnectWalletButton'
+import { LoggedIn } from './components/LoggedIn'
+import { Navigation } from './components/Navigation'
+import { ConnecWalletButton } from '../ConnectedWalletButton'
 
 export function Header() {
   const [walletAddress, setWalletAddress] = useState<string>('')
-
-  const navigationItems = [
-    { name: 'HOME', href: '/' },
-    { name: 'MINT', href: '/mint' },
-    { name: 'JOIN US', href: '/mint' },
-  ]
 
   async function verifyIfWalletIsConnected() {
     const { ethereum } = window
@@ -34,6 +30,10 @@ export function Header() {
     }
   }
 
+  function refreshPage() {
+    window.location.reload()
+  }
+
   async function onConnectWallet() {
     const { ethereum } = window
 
@@ -45,6 +45,7 @@ export function Header() {
       const signer = provider.getSigner()
       const address = await signer.getAddress()
 
+      refreshPage()
       setWalletAddress(address)
       console.log('walletAddress ==>', address)
     } else {
@@ -63,36 +64,10 @@ export function Header() {
           <Image src={logoImg} alt="Logo da weirds" />
         </Link>
 
-        <ul className="flex items-center gap-11 text-lg font-semibold">
-          {navigationItems.map((navItem) => {
-            const isMintItem = navItem.name.includes('MINT')
+        <Navigation />
 
-            return (
-              <li
-                key={navItem.name}
-                className={
-                  isMintItem
-                    ? `bg-clip-text bg-purple-gradient text-transparent`
-                    : `text-white`
-                }
-              >
-                <Link href={navItem.href}>{navItem.name}</Link>
-              </li>
-            )
-          })}
-        </ul>
         {walletAddress ? (
-          <div className="flex items-center gap-3 font-medium">
-            <span className="text-xl text-white">wallet connected:</span>
-            <strong className="text-xl text-transparent bg-purple-gradient bg-clip-text font-bold">
-              {walletAddress.slice(0, 5) +
-                '...' +
-                walletAddress.slice(
-                  walletAddress.length - 4,
-                  walletAddress.length,
-                )}
-            </strong>
-          </div>
+          <LoggedIn walletAddress={walletAddress} />
         ) : (
           <ConnecWalletButton onConnect={onConnectWallet} />
         )}

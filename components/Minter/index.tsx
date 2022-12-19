@@ -1,6 +1,5 @@
 import testNftImg from '../../assets/test-nft.png'
 
-import { CaretRight, CaretLeft } from 'phosphor-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { ethers } from 'ethers'
@@ -12,14 +11,18 @@ import {
   getTotalNFTsMintedByUser,
   getTotalSupply,
 } from '../../contract/functions'
+import { MintButton } from './components/MintButton'
+import { ChangeAmountToMint } from './components/ChangeAmountToMint'
 
 export function Minter() {
   const [totalSupply, setTotalSupply] = useState<number>(0)
   const [maxSupplyPerWallet, setMaxSupplyPerWallet] = useState<number>(0)
   const [userNftsMinted, setUserNftsMinted] = useState<number>(0)
+  const [isMinting, setIsMinting] = useState<boolean>(false)
+
   const [totalAmountOfNFTsMinted, setTotalAmountOfNFTsMinted] =
     useState<number>(0)
-  const [amountOfNftsToBuy, setAmountOfNftsToBuy] = useState<number>(0)
+  const [amountOfNftsToMint, setAmountOfNftsToMint] = useState<number>(1)
   const [walletAddress, setWalletAddress] = useState<string>('')
   const [contractIsEnabled, setContractEnabled] = useState<boolean>(true)
 
@@ -27,73 +30,89 @@ export function Minter() {
 
   const nftPrice = 0.01
 
+  const blockIncreaseNFTsAmounToMint =
+    totalAmountOfNFTsMinted + amountOfNftsToMint === maxSupplyPerWallet
+
   const maxSupplyReached = totalAmountOfNFTsMinted === totalSupply
+
   const maxSupplyPerUserReached = userNftsMinted === maxSupplyPerWallet
 
   const disableMint =
     !contractIsEnabled || maxSupplyReached || maxSupplyPerUserReached
 
-  function handleIncreaseBuyAmount() {
-    setAmountOfNftsToBuy((prevAmount) => prevAmount + 1)
+  function onIncreaseBuyAmount() {
+    setAmountOfNftsToMint((prevAmount) => prevAmount + 1)
   }
 
-  function handleDecreaseBuyAmount() {
-    setAmountOfNftsToBuy((prevAmount) => prevAmount - 1)
+  function onDecreaseBuyAmount() {
+    setAmountOfNftsToMint((prevAmount) => prevAmount - 1)
   }
 
-  async function handleMintNFT(amountToMint: number) {
+  async function onMintNFT() {
     const { ethereum } = window
 
     if (ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      try {
+        setIsMinting(true)
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
 
-      await provider.send('eth_requestAccounts', [])
+        await provider.send('eth_requestAccounts', [])
 
-      const signer = provider.getSigner()
+        const signer = provider.getSigner()
 
-      const contractInstace = new ethers.Contract(
-        contractAddress,
-        contractAbi,
-        provider,
-      )
+        const contractInstace = new ethers.Contract(
+          contractAddress,
+          contractAbi,
+          provider,
+        )
 
-      const contractWithSigner = await contractInstace.connect(signer)
-      console.log('contractWithSigner', contractWithSigner)
+        const contractWithSigner = await contractInstace.connect(signer)
+        console.log('contractWithSigner', contractWithSigner)
 
-      const isEnabled = await contractWithSigner.isEnabled()
-      console.log('isEnabled', isEnabled)
+        const isEnabled = await contractWithSigner.isEnabled()
+        console.log('isEnabled', isEnabled)
 
-      if (isEnabled) {
-        const isWhitelistOn = await contractWithSigner.isWhitelistOn()
-        console.log('isWhitelistOn', isWhitelistOn)
+        if (isEnabled) {
+          const isWhitelistOn = await contractWithSigner.isWhitelistOn()
+          console.log('isWhitelistOn', isWhitelistOn)
 
-        if (isWhitelistOn) {
-          const addressIsOnWhitelist = await contractWithSigner.addressToBoolWl(
-            walletAddress,
-          )
-          console.log('addressIsOnWhitelist', addressIsOnWhitelist)
+          if (isWhitelistOn) {
+            const addressIsOnWhitelist =
+              await contractWithSigner.addressToBoolWl(walletAddress)
+            console.log('addressIsOnWhitelist', addressIsOnWhitelist)
 
-          if (addressIsOnWhitelist) {
-            const mintNft = await contractWithSigner.mintNFT(amountToMint, {
-              value: ethers.utils.parseUnits(
-                String(amountToMint * nftPrice),
-                'ether',
-              ),
-            })
+            if (addressIsOnWhitelist) {
+              const mintNft = await contractWithSigner.mintNFT(
+                amountOfNftsToMint,
+                {
+                  value: ethers.utils.parseUnits(
+                    String(amountOfNftsToMint * nftPrice),
+                    'ether',
+                  ),
+                },
+              )
 
-            console.log('mintNftWithWhitelist', mintNft)
+              console.log('mintNftWithWhitelist', mintNft)
+              setIsMinting(false)
+            }
+          } else {
+            const mintNft = await contractWithSigner.mintNFT(
+              amountOfNftsToMint,
+              {
+                value: ethers.utils.parseUnits(
+                  String(amountOfNftsToMint * nftPrice),
+                  'ether',
+                ),
+              },
+            )
+            console.log('mintNft', mintNft)
+            setIsMinting(false)
           }
         } else {
-          const mintNft = await contractWithSigner.mintNFT(amountToMint, {
-            value: ethers.utils.parseUnits(
-              String(amountToMint * nftPrice),
-              'ether',
-            ),
-          })
-          console.log('mintNft', mintNft)
+          setContractEnabled(false)
         }
-      } else {
-        setContractEnabled(false)
+      } catch (err) {
+        setIsMinting(false)
       }
     } else {
       alert("You don't have the metamask extension installed!")
@@ -155,43 +174,28 @@ export function Minter() {
             Ipsum has been the industrys standard dummy
           </p>
         </div>
-        <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold">AMOUNT: </h2>
-          <div className="flex item-center gap-4">
-            <CaretLeft
-              onClick={handleDecreaseBuyAmount}
-              className="text-white cursor-pointer"
-              size={48}
-              weight="fill"
-            />
-
-            <span className="font-bold text-[32px]">{amountOfNftsToBuy}</span>
-
-            <CaretRight
-              onClick={handleIncreaseBuyAmount}
-              className="text-white cursor-pointer"
-              size={48}
-              weight="fill"
-            />
-          </div>
-        </div>
+        <ChangeAmountToMint
+          amountOfNftsToMint={amountOfNftsToMint}
+          onDecreaseAmount={onDecreaseBuyAmount}
+          onIncreaseAmount={onIncreaseBuyAmount}
+          blockAmountChange={blockIncreaseNFTsAmounToMint}
+        />
         <div className="flex flex-col gap-4 font-medium">
           <span className="text-gray100 text-lg">
             Total supply: {totalAmountOfNFTsMinted} / {totalSupply}
           </span>
-          <button
-            disabled={disableMint}
-            onClick={() => handleMintNFT(amountOfNftsToBuy)}
-            className="w-full py-4 bg-purple-gradient rounded-xl text-lg text-white font-bold shadow-lg"
-          >
-            {walletAddress
-              ? `MINT (Minted: ${userNftsMinted} / ${maxSupplyPerWallet})`
-              : 'CONNECT WALLET'}
-          </button>
+          <MintButton
+            disableMint={disableMint}
+            walletAddress={walletAddress}
+            maxSupplyPerUser={maxSupplyPerWallet}
+            mintedByUserAmount={userNftsMinted}
+            onMint={onMintNFT}
+            isMinting={isMinting}
+          />
         </div>
       </div>
       <div className="max-w-[328px] w-full flex flex-col">
-        <h1 className="text-5xl font-bold text-end">0.01 MATIC</h1>
+        <h1 className="text-5xl font-bold text-end">0.01 ETH</h1>
         <Image className="mt-auto" src={testNftImg} alt="NFT image" />
       </div>
     </div>
