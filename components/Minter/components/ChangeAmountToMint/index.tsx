@@ -39,7 +39,8 @@ export function ChangeAmountToMint({
         <span className="font-bold text-[32px] px-1">{amountOfNftsToMint}</span>
 
         <CaretRight
-          onClick={!blockAmountChange ? handleIncreaseBuyAmount : () => {}}
+          // onClick={!blockAmountChange ? handleIncreaseBuyAmount : () => {}}
+          onClick={amountOfNftsToMint < 5 ? handleIncreaseBuyAmount : () => {}}
           className={` ${
             blockAmountChange
               ? `text-gray500 cursor-auto`

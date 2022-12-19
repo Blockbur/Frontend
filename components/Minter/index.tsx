@@ -81,6 +81,20 @@ export function Minter() {
               await contractWithSigner.addressToBoolWl(walletAddress)
             console.log('addressIsOnWhitelist', addressIsOnWhitelist)
 
+            if (userNftsMinted + amountOfNftsToMint > 5) {
+              alert('You can not mint more than 5 NFTs per wallet!')
+              setIsMinting(false)
+              // eslint-disable-next-line no-throw-literal
+              throw 'You can not mint more than 5 NFTs per wallet!'
+            }
+
+            if (!addressIsOnWhitelist) {
+              alert('Your address is not whitelisted!')
+              setIsMinting(false)
+              // eslint-disable-next-line no-throw-literal
+              throw 'Your address is not whitelisted!'
+            }
+
             if (addressIsOnWhitelist) {
               const mintNft = await contractWithSigner.mintNFT(
                 amountOfNftsToMint,
@@ -195,7 +209,9 @@ export function Minter() {
         </div>
       </div>
       <div className="max-w-[328px] w-full flex flex-col">
-        <h1 className="text-5xl font-bold text-end">0.01 ETH</h1>
+        <h1 className="text-5xl font-bold text-end">
+          {amountOfNftsToMint * 0.01} ETH
+        </h1>
         <Image className="mt-auto" src={testNftImg} alt="NFT image" />
       </div>
     </div>
